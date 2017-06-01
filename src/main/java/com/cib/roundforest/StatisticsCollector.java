@@ -35,6 +35,7 @@ public class StatisticsCollector implements Runnable{
     public StatisticsCollector(InputProvider provider, OutputConsumer consumer) {
         this.provider = provider;
         this.thread = new Thread(this);
+        this.thread.setDaemon(true);
         this.consumer = consumer;
     }
 

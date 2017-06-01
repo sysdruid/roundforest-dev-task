@@ -14,7 +14,7 @@ public class Main {
     private File inputFile;
     private int chunkLimit = 100;
     private int printLimit = 10;
-    private int workerCount = 8;
+    private int workerCount = 4;
 
     public void setWorkerCount(int workerCount) {
         this.workerCount = workerCount;
@@ -45,14 +45,16 @@ public class Main {
     public void run() throws IOException {
         long start = System.currentTimeMillis();
         CSVInputProvider provider = new CSVInputProvider(inputFile);
+        RecordBuffer buffer = new RecordBuffer(provider);
         InmemoryOutputConsumer consumer = new InmemoryOutputConsumer();
 
+        buffer.setChunkLimit(chunkLimit);
         provider.setChunkLimit(chunkLimit);
         consumer.setPrintLimit(printLimit);
 
         List<StatisticsCollector> collectorList = new ArrayList<>();
         for(int i=0; i<workerCount; i++) {
-            StatisticsCollector collector = new StatisticsCollector(provider, consumer);
+            StatisticsCollector collector = new StatisticsCollector(buffer, consumer);
             collectorList.add(collector);
             collector.start();
         }
