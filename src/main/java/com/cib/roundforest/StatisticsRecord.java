@@ -7,7 +7,7 @@ import java.util.Map;
  *
  * @author Yury Altukhou
  */
-public class OutputRecord {
+public class StatisticsRecord {
 
     private final Map<String,Integer> userCounts = new HashMap<>();
     private final Map<String,Integer> productCounts = new HashMap<>();

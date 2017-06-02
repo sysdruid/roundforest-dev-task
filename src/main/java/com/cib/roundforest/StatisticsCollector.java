@@ -1,5 +1,6 @@
 package com.cib.roundforest;
 
+import com.cib.roundforest.pipes.Worker;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -12,7 +13,7 @@ import java.util.stream.Stream;
  *
  * @author Yury Altukhou
  */
-public class StatisticsCollector implements Runnable{
+public class StatisticsCollector extends Worker<List<InputRecord>,StatisticsRecord> {
     private static final Set<String> STOP_WORDS = new HashSet<>();
     static {
         try (Stream<String> stream = Files.lines(Paths.get("src/main/resources/stop-words.txt"))) {
@@ -25,39 +26,15 @@ public class StatisticsCollector implements Runnable{
         } catch (IOException ex) {
             throw new RuntimeException("Fail to read stop-words.txt", ex);
         }
-        STOP_WORDS.add("s");
-        STOP_WORDS.add("t");
-    }
-    private final OutputConsumer consumer;
-    private final InputProvider provider;
-    private final Thread thread;
-
-    public StatisticsCollector(InputProvider provider, OutputConsumer consumer) {
-        this.provider = provider;
-        this.thread = new Thread(this);
-        this.thread.setDaemon(true);
-        this.consumer = consumer;
+        //STOP_WORDS.add("s");
+        //STOP_WORDS.add("t");
     }
 
-    @Override
-    public void run() {
-        List<InputRecord> records = provider.getRecords();
-        while(records != null && !records.isEmpty()) {
-            OutputRecord output = process(records);
-            consumer.putOutputRecord(output);
-            records = provider.getRecords();
-        }
+    public StatisticsCollector() {
     }
 
-    public void start() {
-        thread.start();
-    }
-    public void join() throws InterruptedException {
-        thread.join();
-    }
-
-    private void collectWords(OutputRecord result, String text) {
-        String[] words = text.split("<[^>]*>|\\W");
+    private void collectWords(StatisticsRecord result, String text) {
+        String[] words = text.split("<[^>]*>|[\\W&&[^`']]|[`'](?!\\w)|(?<!\\w)[`']");
         //String[] words = text.split("\\W");
         for(String word: words) {
             if(word.isEmpty()) {
@@ -70,8 +47,9 @@ public class StatisticsCollector implements Runnable{
         }
     }
 
-    private OutputRecord process(List<InputRecord> records) {
-        OutputRecord result = new OutputRecord();
+    @Override
+    protected StatisticsRecord process(List<InputRecord> records) {
+        StatisticsRecord result = new StatisticsRecord();
         records.forEach((record) -> {
             result.addProduct(record.getProductId(), 1);
             result.addUser(record.getUserId(), 1);

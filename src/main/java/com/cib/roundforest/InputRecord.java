@@ -16,6 +16,21 @@ public class InputRecord {
     private String summary;
     private String text;
 
+    InputRecord copy() {
+        InputRecord result = new InputRecord();
+        result.id = id;
+        result.productId = productId;
+        result.userId = userId;
+        result.profileName = profileName;
+        result.helpfulnessNumerator = helpfulnessNumerator;
+        result.helpfulnessDenominator = helpfulnessDenominator;
+        result.score = score;
+        result.time = time;
+        result.summary = summary;
+        result.text = text;
+        return result;
+    }
+
     /**
      * @return the helpfulnessDenominator
      */

@@ -1,5 +1,7 @@
 package com.cib.roundforest;
 
+import com.cib.roundforest.pipes.Sink;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.LinkedList;
 import java.util.Map;
@@ -9,12 +11,20 @@ import java.util.Map.Entry;
  *
  * @author Yury Altukhou
  */
-public class InmemoryOutputConsumer implements OutputConsumer{
-    private final OutputRecord storage = new OutputRecord();
+public class InmemoryStatisticsConsumer implements Sink<StatisticsRecord>{
+    private final StatisticsRecord storage = new StatisticsRecord();
     private int printLimit = 10;
 
     @Override
-    public synchronized void putOutputRecord(OutputRecord record) {
+    public void close() throws IOException {
+    }
+
+    public StatisticsRecord getStorage() {
+        return storage;
+    }
+
+    @Override
+    public synchronized void putData(StatisticsRecord record) {
         record.getProductCounts().entrySet().forEach((entry) -> {
             storage.addProduct(entry.getKey(), entry.getValue());
         });
