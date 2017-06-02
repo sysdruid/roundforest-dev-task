@@ -33,8 +33,7 @@ Though full lexical analysis wasn't done, no words form detection and some commo
 There is GoogleTranslatorMock that pretends to handle multiple requests at once. Yet it checks for limitations: no more then 100 concurent calls, messages less then 1000 simbols. Though I lowered execution time to 10ms, otherwise testing on the 300mb file is too slow(and as requests are suboptimal time can be even greater then expected).
 The mock has nothing to do with http requests, though interface it implements can be implemented with http calls support.
 Translation raised some questions. 
-* some reviews are longer then 1000 simbols(particulary at least one is 21kb)
-** thinking of spliting those on sentence ending('!.?')
+* some reviews are longer then 1000 simbols(particulary at least one is 21kb). Thinking of spliting those on sentence ending('!.?')
 * in everage review length is 450 chars, so we can pack them tighter, but in conjunction with spliting to much effort currently.
 * we should not keep in memory too much records from csv file though it could heppen as statistics and translation is done with different pace. This was implemented by adding two buffers(each record is put in both buffers) and buffers has size limit, so if one is emptied faster then the other the first one will starve.
 In total: I hadn't enough time to make things right and optimize requests by size. 
@@ -47,11 +46,11 @@ There is a couple of test. One for csv reading and the other one is integrationa
 No loggin was added except Exception.printStackTrace() here and there.
 #### Multiple machines
 To support multiple nodes we need:
-* add some coordination
-** message buss
-** do it with centrall db
-* open file with random access on each machine trying to access different parts of the file. 
-** e.g. split them on 300Mb boundry
-** lookup next new line char in file on those baundies
-* have centrall storage storage where all results will be merged.
+##### add some coordination
+* message buss
+* do it with centrall db
+##### open file with random access on each machine trying to access different parts of the file. 
+* e.g. split them on 300Mb boundry
+* lookup next new line char in file on those baundies
+##### have centrall storage storage where all results will be merged.
 Tough as I see translation api limits make it useless.
